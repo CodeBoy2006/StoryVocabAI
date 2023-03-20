@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>生词本</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='spinner.css') }}">
+    <script src="{{ url_for('static', filename='jquery-3.6.4.min.js') }}"></script>
+</head>
+<body>
+    <h1 id="title">StoryVocabAI</h1>
+    <div class="cssload-loader" style="display: none;">
+        <div class="cssload-inner cssload-one"></div>
+        <div class="cssload-inner cssload-two"></div>
+        <div class="cssload-inner cssload-three"></div>
+    </div>
+    <form id="sentence_form" method="POST" style="text-align:center">
+        <input style="width:50%" maxlength="250" minlength="12" type="text" name="sentence" placeholder="含有生词的句子" required>
+        <input class="submit_btn" type="submit" value="提交">
+    </form>
+    <hr>
+    {% for word in words %}
+    <div class="word_card">
+        <h3 class="word">{{ word['word'] }} {% if word['word_normal'] != word['word'] %} ({{ word['word_normal'] }}) {% endif %}</h3>
+        <p class="pronunciation">{{ word['pronunciation'] }}</p>
+        <p class="meaning"><mark>释义</mark>: {{ word['meaning'] }}</p>
+        <p class="orig_text"><span style="font-style:italic; font-weight: bolder;">({{ word['part_of_speech'] }})</span> {{ word['orig_text'] }}</p>
+        <p class="orig_trans">{{ word['orig_translation'] }}</p>
+    </div>
+    {% endfor %}
+</body>
+<script>
+    $(document).ready(function(){
+      window.history.replaceState(null, null, window.location.href);
+
+      $('#sentence_form').submit(function(e) {
+        e.preventDefault();
+        $(".cssload-loader").show(1000,"linear");
+        this.submit();
+      });
+    });
+</script>
+
+</html>
