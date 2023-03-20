@@ -1,7 +1,8 @@
 import backend as backend
 from flask import Flask, render_template, request
 import sqlite3
-from backend.openai_ops and backend.utils import *
+from backend.openai_ops import *
+from backend.utils import *
 
 app = Flask(__name__)
 
@@ -16,19 +17,36 @@ def index():
                              data.word_normal,
                              data.word_meaning,
                              data.pronunciation,
-                             data.orig_text,
+                             highlight_words(data.orig_text, [data.word, data.word_normal]),
                              data.translated_text,
                              data.part_of_speech)
     words = get_words_from_database()
     return render_template('index.html', words=words)
+
+@app.route('/delete_word', methods=['POST'])
+def deleteWord():
+    data = request.get_json()
+    print(data["target"])
+    connection = sqlite3.connect('words.db')
+    cursor = connection.cursor()
+    try:
+    # print('DELETE FROM words WHERE id=', data['target'])
+        cursor.execute('DELETE FROM words WHERE id='+str(data['target']))
+    except:
+        return 'server fault', 500
+    connection.commit()
+    connection.close()
+    return 'deleted successfully', 200
 
 
 # 将单词添加到SQLite数据库
 def add_word_to_database(word, word_normal, meaning, pronunciation, orig_text, orig_translation, part_of_speech):
     connection = sqlite3.connect('words.db')
     cursor = connection.cursor()
-    cursor.execute('INSERT INTO words (word, word_normal, meaning, pronunciation, orig_text, orig_translation, part_of_speech) VALUES'
-                   '(?, ?, ?, ?, ?, ?, ?)', (word, word_normal, meaning, pronunciation, orig_text, orig_translation, part_of_speech))
+    cursor.execute('INSERT INTO words'
+                   '(word, word_normal, meaning, pronunciation, orig_text, orig_translation, part_of_speech) VALUES'
+                   '(?, ?, ?, ?, ?, ?, ?)',
+                   (word, word_normal, meaning, pronunciation, orig_text, orig_translation, part_of_speech))
     connection.commit()
     connection.close()
 

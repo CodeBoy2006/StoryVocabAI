@@ -7,13 +7,18 @@ body {
 #title {
     font-size: 36px;
     text-align: center;
+    margin-block-end: auto;
+}
+
+#subtitle {
+    font-size: 20px;
+    text-align: center;
 }
 
 input[type=text], input[type=password] {
     padding: 10px;
     margin: 5px;
     border-radius: 5px;
-    border: none;
     border: 1px solid #ccc;
 }
 
@@ -34,11 +39,53 @@ input[type=submit]:hover {
     background-color: #3e8e41;
 }
 
+.speak {
+    padding: 10px;
+    margin: 5px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+}
+
+.speak:hover {
+    background-color: #3e8e41;
+}
+
+.delete {
+    padding: 10px;
+    margin: 5px;
+    background-color: #af4c4c;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+}
+
+.delete:hover {
+    background-color: #8e3e3e;
+}
+
 .word_card {
     padding: 10px;
     margin: 5px;
+    margin-bottom: 0;
     background-color: #fff;
     border-radius: 5px;
+    border-bottom: #333333 dashed;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+}
+
+.panel {
+    display: none;
+    padding: 10px;
+    margin: 5px;
+    margin-top: 0;
+    background-color: #e5f6e5;
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
 }
 

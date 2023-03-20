@@ -5,26 +5,42 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='spinner.css') }}">
     <script src="{{ url_for('static', filename='jquery-3.6.4.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='icons.js') }}" crossorigin="anonymous"></script>
+<!--    <script src="https://kit.fontawesome.com/600a4fcfff.js" crossorigin="anonymous"></script>-->
 </head>
 <body>
-    <h1 id="title">StoryVocabAI</h1>
+    <h1 id="title">AwesomeVocabAI<span style="font-size:10px">(AVA)</span></h1>
+    <h1 id="subtitle">智能生词本 <span style="font-size:10px">Dev 0.03</span></h1>
     <div class="cssload-loader" style="display: none;">
         <div class="cssload-inner cssload-one"></div>
         <div class="cssload-inner cssload-two"></div>
         <div class="cssload-inner cssload-three"></div>
     </div>
     <form id="sentence_form" method="POST" style="text-align:center">
-        <input style="width:50%" maxlength="250" minlength="12" type="text" name="sentence" placeholder="含有生词的句子" required>
+        <input style="width:50%" maxlength="250" minlength="24" type="text" name="sentence" placeholder="含有生词的句子" required>
         <input class="submit_btn" type="submit" value="提交">
     </form>
     <hr>
     {% for word in words %}
-    <div class="word_card">
+    <div class="word_card" id="{{ loop.index }}" id-word="{{ word['id'] }}">
         <h3 class="word">{{ word['word'] }} {% if word['word_normal'] != word['word'] %} ({{ word['word_normal'] }}) {% endif %}</h3>
         <p class="pronunciation">{{ word['pronunciation'] }}</p>
+    </div>
+    <div class="panel" id="info-{{ loop.index }}" id-word="{{ word['id'] }}">
+        <button class="speak" word="{{ word['word'] }}">
+            <i class="fa-solid fa-volume-high"></i>
+            发音
+        </button>
         <p class="meaning"><mark>释义</mark>: {{ word['meaning'] }}</p>
-        <p class="orig_text"><span style="font-style:italic; font-weight: bolder;">({{ word['part_of_speech'] }})</span> {{ word['orig_text'] }}</p>
+        <p class="orig_text"><span style="font-style:italic; font-weight: bolder;">({{ word['part_of_speech'] }})</span> {{ word['orig_text'] |safe }}</p>
         <p class="orig_trans">{{ word['orig_translation'] }}</p>
+
+        <div style="background:linear-gradient(to left,#e3f4e4,#b6b6b6,#e3f4e4);height:3px;"></div>
+
+        <button class="delete" id-word="{{ word['id'] }}">
+            <i class="fa-solid fa-trash"></i>
+            已掌握
+        </button>
     </div>
     {% endfor %}
 </body>
@@ -39,5 +55,6 @@
       });
     });
 </script>
+<script src="{{ url_for('static', filename='page_function.js') }}"></script>
 
 </html>
