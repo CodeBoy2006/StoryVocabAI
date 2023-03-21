@@ -21,6 +21,7 @@ class WordSample:
     orig_text: str
     translated_text: str
     part_of_speech: str
+    add_date = Optional[str]
 
     @classmethod
     def make_empty(cls, word: str) -> 'WordSample':

@@ -69,12 +69,72 @@ input[type=submit]:hover {
     padding: 10px;
     margin: 5px;
     margin-bottom: 0;
-    background-color: #fff;
+    !important;background-color: #fff;
     border-radius: 5px;
     border-bottom: #333333 dashed;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+}
+
+.export {
+    padding: 10px;
+    margin: 5px;
+    background-color: #4c8caf;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+}
+
+.export:hover {
+    background-color: #3e828e;
+}
+
+.story {
+    padding: 10px;
+    margin: 5px;
+    background-color: #6d4caf;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+}
+
+.story:hover {
+    background-color: #6e3e8e;
+}
+
+.manual_btn {
+    padding: 10px;
+    margin: 5px;
+    background-color: #4c7aaf;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+}
+
+.manual_btn:hover {
+    background-color: #3e6f8e;
+}
+
+.dialog{
+    border-radius: 5px;
+    background-color: rgb(243, 243, 244);
+    /*position: fixed;*/
+    text-align: center;
+    width: 75%;
+}
+
+.close_dialog_btn {
+    padding: 10px;
+    margin: 5px;
+    background-color: #4c7aaf;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+}
+
+.close_dialog_btn:hover {
+    background-color: #3e6f8e;
 }
 
 .panel {
@@ -87,6 +147,12 @@ input[type=submit]:hover {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+}
+
+.control_panel {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .word {
@@ -104,6 +170,12 @@ input[type=submit]:hover {
     color: grey;
 }
 
+.addate{
+    font-size: 14px;
+    color: grey;
+    line-height: 28px;
+}
+
 .orig_trans {
     font-size: 16px;
     color: grey;
@@ -112,3 +184,4 @@ input[type=submit]:hover {
 .meaning {
     font-size: 18px;
 }
+

@@ -1,23 +1,29 @@
-import backend as backend
-from flask import Flask, render_template, request
 import sqlite3
+
+import random
+import requests
+from flask import Flask, render_template, request
+
+from backend.export import export_CSV
 from backend.openai_ops import *
 from backend.utils import *
 
 app = Flask(__name__)
 
-
-# 路由和视图函数
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         sentence = request.form['sentence']
-        data = get_word_and_translation(sentence, '').word_sample
+        known_words = {*[x['word'] for x in get_words_from_database()],
+                       *[x['word_normal'] for x in get_words_from_database()]} # exclude known words
+        exist_known_words = known_words & tokenize_text(sentence)
+        # print(exist_known_words)
+        data = get_word_and_translation(sentence, exist_known_words).word_sample
         add_word_to_database(data.word,
                              data.word_normal,
                              data.word_meaning,
                              data.pronunciation,
-                             highlight_words(data.orig_text, [data.word, data.word_normal]),
+                             highlight_words(data.orig_text, [data.word, data.word_normal]), # highlight the key word
                              data.translated_text,
                              data.part_of_speech)
     words = get_words_from_database()
@@ -31,21 +37,62 @@ def deleteWord():
     cursor = connection.cursor()
     try:
     # print('DELETE FROM words WHERE id=', data['target'])
-        cursor.execute('DELETE FROM words WHERE id='+str(data['target']))
+        cursor.execute('UPDATE words SET is_mastered = 1 WHERE id='+str(data['target'])) # mark as known word in the DB
     except:
         return 'server fault', 500
     connection.commit()
     connection.close()
     return 'deleted successfully', 200
 
+# Export words and its details to CSV form
+@app.route('/export', methods=['POST'])
+def export():
+    file = export_CSV()
+    return {'file': file}
 
-# 将单词添加到SQLite数据库
+@app.route('/add_single_word', methods=['POST'])
+def add_single_word():
+    data = request.get_json()
+    print(data['word'])
+    dataraw = requests.get('https://dict.youdao.com/jsonapi?q='+data['word'])
+    winfo = dataraw.json()
+    meaning = ""
+    for i in winfo["syno"]["synos"]:
+        meaning += i["syno"]["pos"] + ' ' + i["syno"]["tran"] + '<br>'
+    # print(json.dumps(data["syno"]["synos"], indent=4))
+    print(meaning)
+    add_word_to_database(data["word"].lower(), data["word"].lower(), meaning, '/' + winfo["ec"]["word"][0]["ukphone"] + '/', "Not Available",
+                         "手动添加暂时不支持例句", "None")
+    # try:
+    #
+    # except:
+    #     return "Failed to get the meaning of the word", 500
+    return winfo["syno"]["synos"], 200
+
+@app.route('/story', methods=['POST'])
+def write_story():
+    connection = sqlite3.connect('words.db')
+    connection.row_factory = dict_factory
+    cursor = connection.cursor()
+    cursor.execute('SELECT * FROM words WHERE is_mastered = 0 ORDER BY id DESC;') # choose the words which are not mastered
+    words = cursor.fetchall()
+    random.shuffle(words)
+    # print(words)
+    chosen = []
+    for i in range(0, min(len(words), 5)): # choose 5 words randomly
+        chosen.append(words[i])
+    connection.close()
+    story = get_story(chosen, LiveStoryInfo())
+    return {"story": highlight_story_text(story), "words": chosen}
+
+
+# Add a word to SQLite database
 def add_word_to_database(word, word_normal, meaning, pronunciation, orig_text, orig_translation, part_of_speech):
     connection = sqlite3.connect('words.db')
     cursor = connection.cursor()
-    cursor.execute('INSERT INTO words'
-                   '(word, word_normal, meaning, pronunciation, orig_text, orig_translation, part_of_speech) VALUES'
-                   '(?, ?, ?, ?, ?, ?, ?)',
+    cursor.execute('''INSERT INTO words
+                   (word, word_normal, meaning, pronunciation, orig_text, orig_translation, part_of_speech, add_date) VALUES
+                   (?, ?, ?, ?, ?, ?, ?, DateTime('now', 'localtime'))''',
                    (word, word_normal, meaning, pronunciation, orig_text, orig_translation, part_of_speech))
     connection.commit()
     connection.close()
@@ -58,8 +105,8 @@ def dict_factory(cursor, row):
     return d
 
 
-# 从SQLite数据库中获取单词
-def get_words_from_database():
+# Query words from database
+def get_words_from_database() -> list[Any]:
     connection = sqlite3.connect('words.db')
     connection.row_factory = dict_factory
     cursor = connection.cursor()

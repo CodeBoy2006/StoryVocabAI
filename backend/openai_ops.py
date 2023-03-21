@@ -1,10 +1,10 @@
 import logging
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set
 
 import openai
 
 from backend.exceptions import OpenAIServiceError
-from backend.models import TranslationResult, LiveTranslationInfo, WordSample
+from backend.models import TranslationResult, WordSample, LiveStoryInfo
 
 logger = logging.getLogger()
 
@@ -190,3 +190,64 @@ def query_openai(
             content += delta_content
     # Return the content at once
     return content.strip()
+
+
+# The prompt being used to generate story from words
+prompt_write_story_user_tmpl = """\
+Please write a short story which is less than 200 words, the story should use simple words and these special words must be included: {words}. Also surround every special word with a single "$" character at the beginning and the end.
+"""
+
+
+def get_story(words: List[dict], live_info: LiveStoryInfo) -> str:
+    """Query OpenAI to get a story.
+
+    :param live_info: The info object which represents the writing procedure
+    :return: The story text
+    :raise: OpenAIServiceError
+    """
+    _received = ''
+
+    def handle_stream_content(text: str):
+        nonlocal _received
+        _received += text
+        live_info.story_text = _received
+
+    # Try to use the normal form of each word
+    str_words = [w["word_normal"] or w["word"] for w in words]
+    try:
+        return query_story(str_words, stream_handler=handle_stream_content)
+    except Exception as e:
+        raise OpenAIServiceError('Error querying OpenAI API: %s' % e)
+    finally:
+        # Ends the live procedure
+        live_info.is_finished = True
+
+
+def query_story(words: List[str], stream_handler: Optional[StreamHandler] = None) -> str:
+    """Query OpenAI API to get a story.
+
+    :param stream_handler: A callback function to handle partial replies.
+    :return: The story text
+    """
+    content = ''
+
+    # Try to use the normal form of each word
+    words_str = ','.join(words)
+    user_content = prompt_write_story_user_tmpl.format(words=words_str)
+    completion = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        stream=True,
+        messages=[
+            # Use a single "user" message at this moment because "system" role doesn't perform better
+            {"role": "user", "content": user_content},
+        ],
+    )
+    for part in completion:
+        logger.debug('Completion API returns: %s', part)
+        delta = part.choices[0].delta
+        delta_content = delta.get('content')
+        if delta_content:
+            if stream_handler:
+                stream_handler(delta_content)
+            content += delta_content
+    return content
