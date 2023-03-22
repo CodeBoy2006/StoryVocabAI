@@ -88,7 +88,7 @@ $(document).ready(function () {
                 console.log("Wrote Successfully");
                 $(".cssload-loader").hide(1000, "linear");
                 $("#storycontent").html(data.responseJSON.story)
-
+                $(".word_detail").children().remove();
                 for(let x of data.responseJSON.words) {
                     $(".word_detail").append($(`.group[id-word='${x.id}']`).html())
                 }
@@ -96,7 +96,8 @@ $(document).ready(function () {
                 $(".dialog").show(500);
 
                 $(".word_detail").find(".panel").slideToggle();
-
+                $(".word_detail").find(".speak").remove()
+                $(".word_detail").find(".delete").remove()
             }
         });
     });

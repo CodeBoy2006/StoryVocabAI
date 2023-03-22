@@ -22,5 +22,5 @@ def highlight_story_text(text: str) -> str:
     """Find all special words in the story text, make them highlighted.
     All special words are in this format: "${...}$"
     """
-    pattern = r'\${?([\w-]*?)}?\$'
-    return re.sub(pattern, r'<mark>\1</mark>', text, flags=re.IGNORECASE)
+    pattern = r'\${?(?!<mark>)([\w-]*?)(?<!<\/mark>)}?\$'
+    return re.sub(pattern, r'<mark>\1</mark>', text, flags=re.IGNORECASE).replace('$', '')

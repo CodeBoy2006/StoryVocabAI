@@ -1,9 +1,9 @@
 import sqlite3
 from datetime import datetime
-
 from xlsxwriter.workbook import Workbook
 
 
+# Export to Excel file
 def export_CSV():
     connection = sqlite3.connect('words.db')
     cursor = connection.cursor()

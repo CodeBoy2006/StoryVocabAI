@@ -7,6 +7,7 @@
     <script src="{{ url_for('static', filename='jquery-3.6.4.min.js') }}"></script>
     <script src="{{ url_for('static', filename='icons.js') }}" crossorigin="anonymous"></script>
     <!--    <script src="https://kit.fontawesome.com/600a4fcfff.js" crossorigin="anonymous"></script>-->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
 <dialog style="display: none" class="dialog">
@@ -15,8 +16,11 @@
     <button class="close_dialog_btn">看完了</button>
 </dialog>
 
-<h1 id="title">Awesome Vocab AI <span style="font-size:10px">(AVA)</span></h1>
-<h1 id="subtitle">智能生词本 <i class="fa-solid fa-book-bookmark"></i> <span style="font-size:10px">Alpha 0.1</span></h1>
+<h1 id="title"><img style="display: inline-block; height: 36px;vertical-align: middle;"
+                    src="{{ url_for('static', filename='favicon.ico') }}"> Awesome Vocab AI <span
+        style="font-size:10px">(AVA)</span></h1>
+<h1 id="subtitle">智能生词本 <i class="fa-solid fa-book-bookmark"></i> <span style="font-size:10px">Alpha 0.1</span>
+</h1>
 <div class="control_panel">
     <button class="export"><i class="fa-solid fa-file-csv"></i> 导出为Excel文件</button>
 </div>
@@ -43,8 +47,8 @@
     {% if word['is_mastered'] == 0 %}
         <div class="group" id-word="{{ word['id'] }}">
             <div class="word_card" id="{{ loop.index }}" id-word="{{ word['id'] }}">
-                <h3 class="word">{{ word['word'] }} {% if word['word_normal'] != word['word'] %} ({{ word['word_normal'] }}
-                    ) {% endif %}</h3>
+                <h3 class="word">{{ word['word'] }} {% if word['word_normal'] != word['word'] %} (
+                    {{ word['word_normal'] }}) {% endif %}</h3>
                 <p class="pronunciation">{{ word['pronunciation'] }}</p>
             </div>
             <div class="panel" id="info-{{ loop.index }}" id-word="{{ word['id'] }}">
